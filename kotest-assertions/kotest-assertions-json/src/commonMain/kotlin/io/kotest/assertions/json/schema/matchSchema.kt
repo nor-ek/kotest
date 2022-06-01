@@ -88,7 +88,11 @@ private fun validate(
    fun ContainsSpec.violation(tree: JsonNode.ArrayNode): List<SchemaViolation> {
       val containsType = schema.typeName()
       val foundElements = tree.elements.count { it.type() == containsType }
-      return violationIf(foundElements == 0, "Expected any item of type $containsType")
+      return violationIf(foundElements == 0, "Expected any item of type $containsType.") +
+         violationIf(
+            !range.contains(foundElements),
+            "Expected $containsType items in range of ${range.first} and ${range.last} but got $foundElements."
+         )
    }
 
    fun JsonSchemaElement.violation(tree: JsonNode.ArrayNode): List<SchemaViolation> =

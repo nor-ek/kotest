@@ -1,5 +1,6 @@
 package io.kotest.assertions.json.schema
 
+import io.kotest.assertions.print.print
 import io.kotest.assertions.shouldFail
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
@@ -108,7 +109,7 @@ class ArraySchemaTest : FunSpec(
          }
          array shouldNotMatchSchema containsStringArray
          shouldFail { array shouldMatchSchema containsStringArray }.message shouldBe """
-            $ => Expected any item of type string
+            $ => Expected any item of type string.
          """.trimIndent()
       }
 
@@ -127,6 +128,35 @@ class ArraySchemaTest : FunSpec(
             array(contains = containsSpec { number() })
          }
          array shouldMatchSchema containsStringArray
+      }
+
+      test("Should parse schema contains with minItems and maxItems") {
+         val schema = parseSchema(
+            """
+               { "type": "array", "contains": {"minItems": 2, "maxItems": 3, "type": "number"} }
+            """.trimIndent()
+         )
+         "[\"life\", \"universe\", \"everything\", 1]" shouldNotMatchSchema schema
+      }
+
+      test("Array contains more numbers than maxItems") {
+         val array = "[\"life\", \"universe\", \"everything\", 42, 41, 43]"
+         val containsStringArray = jsonSchema {
+            array(contains = containsSpec(1..2) { number() })
+         }
+         shouldFail { array shouldMatchSchema containsStringArray }.message shouldBe """
+            $ => Expected number items in range of 1 and 2 but got 3.
+         """.trimIndent()
+      }
+
+      test("Array contains less numbers than minItems") {
+         val array = "[\"life\", \"universe\", \"everything\", 42, 41]"
+         val containsStringArray = jsonSchema {
+            array(contains = containsSpec(3..4) { number() })
+         }
+         shouldFail { array shouldMatchSchema containsStringArray }.message shouldBe """
+            $ => Expected number items in range of 3 and 4 but got 2.
+         """.trimIndent()
       }
 
       test("Array without contains and elementType") {

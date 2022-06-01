@@ -236,4 +236,7 @@ fun jsonSchema(
    JsonSchema.Builder.rootBuilder()
 )
 
-fun JsonSchema.Builder.containsSpec(schema: JsonSchema.Builder.() -> JsonSchemaElement) = ContainsSpec(schema())
+fun JsonSchema.Builder.containsSpec(
+   range: IntRange = 0..Int.MAX_VALUE,
+   schema: JsonSchema.Builder.() -> JsonSchemaElement
+) = ContainsSpec(range, schema())

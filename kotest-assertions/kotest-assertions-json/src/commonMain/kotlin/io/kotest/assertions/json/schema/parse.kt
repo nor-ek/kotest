@@ -1,6 +1,7 @@
 package io.kotest.assertions.json.schema
 
 import ContainsSpec
+import ContainsSpecSerializer
 import io.kotest.assertions.json.JsonNode
 import io.kotest.common.ExperimentalKotest
 import io.kotest.matchers.Matcher
@@ -21,7 +22,6 @@ import io.kotest.matchers.string.haveMinLength
 import io.kotest.matchers.string.match
 import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.KSerializer
-import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.descriptors.buildClassSerialDescriptor
 import kotlinx.serialization.descriptors.element
@@ -32,8 +32,6 @@ import kotlinx.serialization.encoding.decodeStructure
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonContentPolymorphicSerializer
 import kotlinx.serialization.json.JsonElement
-import kotlinx.serialization.json.JsonNull
-import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 
@@ -79,7 +77,7 @@ internal object JsonSchemaArraySerializer : KSerializer<JsonSchema.JsonArray> {
          val elementType =
             kotlin.runCatching { decodeSerializableElement(descriptor, 4, SchemaDeserializer, null) }.getOrNull()
          val containsSpec =
-            kotlin.runCatching { decodeSerializableElement(descriptor, 5, ContainsSpec.serializer()) }.getOrNull()
+            kotlin.runCatching { decodeSerializableElement(descriptor, 5, ContainsSpecSerializer) }.getOrNull()
          while (true) {
             when (val index = decodeElementIndex(descriptor)) {
                3 -> matcher = if (decodeBooleanElement(descriptor, index)) matcher and beUnique() else matcher
